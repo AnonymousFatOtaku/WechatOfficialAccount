@@ -9,6 +9,12 @@ const {writeFile, readFile} = require('fs');
 // 引入config模块
 const {appID, appsecret} = require('../config');
 
+// 引入menu模块
+const menu = require('./menu');
+
+// 引入api模块
+const api = require('./api');
+
 // 定义Wechat类用来获取access_token
 class Wechat {
   constructor() {
@@ -40,7 +46,7 @@ class Wechat {
   // 用来保存access_token的方法，accessToken为要保存的凭据
   saveAccessToken(accessToken) {
     // 将对象转化为json字符串
-    accessToken - JSON.stringify(accessToken);
+    accessToken = JSON.stringify(accessToken);
     // 将access_token保存为一个文件
     return new Promise((resolve, reject) => {
       writeFile('./accessToken.txt', accessToken, err => {
@@ -126,8 +132,48 @@ class Wechat {
         return Promise.resolve(res);
       })
   }
+
+  // 创建自定义菜单
+  createMenu(menu) {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // 获取access_token
+        const data = await this.fetchAccessToken();
+        // 定义请求地址
+        const url = `${api.menu.create}access_token=${data.access_token}`;
+        // 发送请求
+        const result = await rp({method: 'POST', url, json: true, body: menu});
+        resolve(result);
+      } catch (e) {
+        reject('createMenu方法出了问题：' + e);
+      }
+    })
+  }
+
+  // 删除自定义菜单
+  deleteMenu() {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const data = await this.fetchAccessToken();
+        // 定义请求地址
+        const url = `${api.menu.delete}access_token=${data.access_token}`;
+        // 发送请求
+        const result = await rp({method: 'GET', url, json: true});
+        resolve(result);
+      } catch (e) {
+        reject('deleteMenu方法出了问题：' + e);
+      }
+    })
+  }
+
 }
 
 // 模拟测试
-const w = new Wechat();
-w.getAccessToken();
+(async () => {
+  const w = new Wechat();
+  // 先删除再创建
+  let result = await w.deleteMenu();
+  console.log(result);
+  result = await w.createMenu(menu);
+  console.log(result);
+})()
