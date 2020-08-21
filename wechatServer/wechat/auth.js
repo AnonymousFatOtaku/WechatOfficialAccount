@@ -14,6 +14,12 @@ const config = require('../config');
 // 引入tools模块
 const {getUserDataAsync, parseXMLAsync, formatMessage} = require('../utils/tools');
 
+// 引入template模块
+const template = require('./template');
+
+// 引入reply模块
+const reply = require('./reply');
+
 module.exports = () => {
   return async (req, res, next) => {
     // 查看微信服务器提交的参数
@@ -96,33 +102,11 @@ module.exports = () => {
       const message = formatMessage(jsData);
       // console.log(message);
 
-      /*
-      * 一旦遇到以下情况微信都会在公众号会话中向用户下发系统提示："该公众号暂时无法提供服务，请稍后再试"
-      * 1.开发者在5秒内未回复任何内容
-      * 2.开发者回复了异常数据，比如JSON数据、字符串、xml数据中有多余的空格*****等
-      * */
-      // 简单的自动回复，回复文本内容
-      let content = '默认回复';
-      // 判断用户发送的消息是否是文本消息
-      if (message.MsgType === 'text') {
-        // 判断用户发送的消息内容具体是什么
-        if (message.Content === '1') { // 全匹配
-          content = '1的回复';
-        } else if (message.Content === '2') {
-          content = '2的回复';
-        } else if (message.Content.match('测试')) { // 半匹配
-          content = '包含测试的回复';
-        }
-      }
+      const options = reply(message);
 
       // 最终回复用户的消息
-      let replyMessage = `<xml>
-                            <ToUserName><![CDATA[${message.FromUserName}]]></ToUserName>
-                            <FromUserName><![CDATA[${message.ToUserName}]]></FromUserName>
-                            <CreateTime>${Date.now()}</CreateTime>
-                            <MsgType><![CDATA[text]]></MsgType>
-                            <Content><![CDATA[${content}]]></Content>
-                          </xml>`;
+      const replyMessage = template(options);
+      console.log(replyMessage);
 
       // 返回响应给微信服务器
       res.send(replyMessage);
