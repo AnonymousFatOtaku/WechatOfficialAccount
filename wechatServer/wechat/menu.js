@@ -5,26 +5,26 @@ module.exports = {
   "button": [
     {
       "type": "view",
-      "name": "硅谷电影🎬",
+      "name": "硅谷电影",
       "url": "https://www.baidu.com/"
     },
     {
       "type": "view",
-      "name": "语音识别🎤",
+      "name": "语音识别",
       "url": "https://www.baidu.com/"
     },
     {
-      "name": "戳我💋",
+      "name": "戳我",
       "sub_button": [
         {
           "type": "view",
-          "name": "官网☀",
+          "name": "官网",
           "url": "https://www.baidu.com/"
         },
         {
-          "type": "click",
-          "name": "帮助🙏",
-          "key": "help"
+          "type": "view",
+          "name": "帮助",
+          "url": "https://www.baidu.com/"
         }
       ]
     }

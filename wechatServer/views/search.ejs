@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/>
+    <title>Title</title>
+</head>
+<body>
+<h1 id="search">语音识别查电影</h1>
+<ul class="list"></ul>
+<script type="text/javascript" src="http://res2.wx.qq.com/open/js/jweixin-1.6.0.js"></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/zepto/1.2.0/zepto.js"></script>
+<script type="text/javascript">
+
+  /*
+  * JSSDK使用步骤
+  * 1.绑定域名，在接口测试号页面上填写js安全域名接口
+  * 2.引入js文件：http://res2.wx.qq.com/open/js/jweixin-1.6.0.js
+  * 3.通过config接口注入权限验证配置
+  * 4.通过ready接口处理成功验证
+  * 5.通过error接口处理失败验证
+  * */
+  window.onload = function () {
+
+    wx.config({
+      debug: true, // 开启调试模式，调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+      appId: 'wx8a84c3753cd60dc1', // 必填，公众号的唯一标识
+      timestamp: '<%= timestamp %>', // 必填，生成签名的时间戳
+      nonceStr: '<%= noncestr %>', // 必填，生成签名的随机串
+      signature: '<%= signature %>',// 必填，签名
+      jsApiList: [
+        'onMenuShareQQ',
+        'onMenuShareQZone',
+        'startRecord',
+        'stopRecord',
+        'translateVoice'
+      ] // 必填，需要使用的JS接口列表
+    });
+
+    // 测试开发时使用，验证接口是否有权限
+    /*wx.checkJsApi({
+      jsApiList: [
+        'onMenuShareQQ',
+        'onMenuShareQZone',
+        'startRecord',
+        'stopRecord',
+        'translateVoice'], // 需要检测的JS接口列表，所有JS接口列表见附录2
+      success: function (res) {
+        // 以键值对的形式返回，可用的api值true，不可用为false
+        // 如：{"checkResult":{"chooseImage":true},"errMsg":"checkJsApi:ok"}
+        console.log(res);
+      },
+      fail: function (err) {
+        console.log(err);
+      }
+    });*/
+
+    // 微信SDK验证通过的回调函数
+    wx.ready(function () {
+      // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
+
+      // 设置标识判定是否在录音
+      var isRecord = false;
+      // 语音识别功能
+      $('#search').tap(function () {
+        if (!isRecord) {
+          // 开始录音
+          wx.startRecord();
+          isRecord = true;
+        } else {
+          // 结束录音
+          wx.stopRecord({
+            success: function (res) {
+              // 结束录音后会自动将录音上传到微信服务器中，微信服务器会返回一个id来标识录音文件
+              var localId = res.localId;
+              // 将录音转化为文字
+              wx.translateVoice({
+                localId: localId, // 需要识别的音频的本地Id，由录音相关接口获得
+                isShowProgressTips: 1, // 默认为1，显示进度提示
+                success: function (res) {
+                  alert(res.translateResult); // 语音识别的结果
+                }
+              });
+
+              // 查询相应的电影信息
+              // 豆瓣api不允许跨域，使用jsonp解决
+              var url = 'http://t.yushu.im/v2/movie/search?callback=?&q=西虹市首富';
+              // 使用jsonp跨域
+              $.getJSON(url, function (data) {
+                var {subjects} = data;
+                var html = '';
+                subjects.forEach(function (item) {
+                  html += `<li class="item">
+                            <a href="javascript:">
+                              <div class="cover">
+                                <img src="${item.images.small}" alt="${item.title}" data-x="2000" data-y="2963" class="img-show" style="width: 100%;">
+                              </div>
+                              <div class="info">
+                                <h3>${item.title}</h3>
+                                <p class="rank">
+                                  <span>评分:</span>
+                                  <span class="rating">${item.rating.average}</span>
+                                </p>
+                              </div>
+                            </a>
+                           </li>`
+                })
+                $('.list').html(html);
+              })
+              isRecord = false;
+            }
+          });
+        }
+      })
+
+    });
+
+    // 微信SDK验证失败的回调函数
+    wx.error(function (res) {
+      // config信息验证失败会执行error函数，如签名过期导致验证失败，具体错误信息可以打开config的debug模式查看，也可以在返回的res参数中查看，对于SPA可以在这里更新签名。
+    });
+  }
+
+</script>
+</body>
+</html>

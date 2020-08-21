@@ -2,8 +2,13 @@
 
 // 引入xml2js，将xml数据转化成js对象
 const {parseString} = require('xml2js');
+// 引入fs模块
+const {writeFile, readFile} = require('fs');
+// 引入path模块
+const {resolve} = require('path');
 
 module.exports = {
+
   getUserDataAsync(req) {
     return new Promise((resolve, reject) => {
       let xmlData = '';
@@ -53,4 +58,40 @@ module.exports = {
     }
     return message;
   },
+
+  writeFileAsync(data, fileName) {
+    // 将对象转化json字符串
+    data = JSON.stringify(data);
+    // 设置为绝对路径固定生成位置
+    const filePath = resolve(__dirname, fileName);
+    return new Promise((resolve, reject) => {
+      // 将data保存为一个文件
+      writeFile(filePath, data, err => {
+        if (!err) {
+          console.log('文件保存成功');
+          resolve();
+        } else {
+          reject('writeFileAsync方法出了问题：' + err);
+        }
+      })
+    })
+  },
+
+  readFileAsync(fileName) {
+    const filePath = resolve(__dirname, fileName);
+    // 读取本地文件中的数据
+    return new Promise((resolve, reject) => {
+      readFile(filePath, (err, data) => {
+        if (!err) {
+          console.log('文件读取成功');
+          // 将json字符串转化js对象
+          data = JSON.parse(data);
+          resolve(data);
+        } else {
+          reject('readFileAsync方法出了问题：' + err);
+        }
+      })
+    })
+  }
+
 }

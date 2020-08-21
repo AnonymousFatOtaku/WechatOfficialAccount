@@ -7,20 +7,17 @@
 
 // 引入sha1模块
 const sha1 = require('sha1');
-
 // 引入config模块
 const config = require('../config');
-
 // 引入tools模块
 const {getUserDataAsync, parseXMLAsync, formatMessage} = require('../utils/tools');
-
 // 引入template模块
 const template = require('./template');
-
 // 引入reply模块
 const reply = require('./reply');
 
 module.exports = () => {
+
   return async (req, res, next) => {
     // 查看微信服务器提交的参数
     // console.log(req.query);
