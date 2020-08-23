@@ -25,30 +25,27 @@ module.exports = async message => {
     } else if (message.Content.match('测试')) { // 半匹配
       content = '包含测试的回复';
     }
-  } else if (message.MsgType === 'image') { // 用户发送图片消息
-    options.msgType = 'image';
-    options.mediaId = message.MediaId;
-    console.log(message.PicUrl);
   } else if (message.MsgType === 'voice') { // 用户发送语音消息
     options.msgType = 'voice';
     options.mediaId = message.MediaId;
     console.log(message.Recognition);
-  } else if (message.MsgType === 'location') { // 用户发送地理位置
-    content = `纬度：${message.Location_X},经度：${message.Location_Y},地理位置：${message.Label}`;
   } else if (message.MsgType === 'event') { // 事件
     if (message.Event === 'subscribe') { // 用户关注事件
-      content = '感谢关注';
-      if (message.EventKey) {
-        content = '用户扫描带参数二维码进行关注';
-      }
+      content = '欢迎您关注硅谷电影公众号 \n' +
+        '回复 首页 查看硅谷电影预告片 \n' +
+        '回复 热门 查看最热门的电影 \n' +
+        '回复 文本 搜索电影信息 \n' +
+        '回复 语音 搜索电影信息 \n' +
+        '也可以点击下面菜单按钮，来了解硅谷电影公众号';
     } else if (message.Event === 'unsubscribe') { // 用户取消关注事件
       console.log('用户取消关注');
-    } else if (message.Event === 'SCAN') { // 用户已关注再扫描带参数二维码事件
-      content = '用户已关注再扫描带参数二维码';
-    } else if (message.Event === 'LOCATION') { // 上报地理位置事件
-      content = `纬度：${message.Latitude},经度：${message.Longitude},精度：${message.Precision}`;
     } else if (message.Event === 'CLICK') { // 自定义菜单事件
-      content = `点击了按钮：${message.EventKey}`;
+      content = '您可以按照以下提示来进行操作 \n' +
+        '回复 首页 查看硅谷电影预告片 \n' +
+        '回复 热门 查看最热门的电影 \n' +
+        '回复 文本 搜索电影信息 \n' +
+        '回复 语音 搜索电影信息 \n' +
+        '也可以点击下面菜单按钮，来了解硅谷电影公众号';
     }
   }
 

@@ -224,14 +224,14 @@ class Wechat {
 }
 
 // 模拟测试
-/*(async () => {
+(async () => {
   const w = new Wechat();
   // 先删除再创建
-  // let result = await w.deleteMenu();
-  // console.log(result);
-  // result = await w.createMenu(menu);
-  // console.log(result);
+  let result = await w.deleteMenu();
+  console.log(result);
+  result = await w.createMenu(menu);
+  console.log(result);
   const data = w.fetchTicket();
-})()*/
+})()
 
 module.exports = Wechat;
